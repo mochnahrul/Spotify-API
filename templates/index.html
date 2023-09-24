@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Info Lagu</title>
+  </head>
+  <body>
+    {% if is_playing %}
+    <div id="songInfo">
+      <h1>Info Lagu yang Sedang Diputar</h1>
+      <p><strong>Lagu:</strong> <span id="track_name">{{ current_playback['item']['name'] }}</span></p>
+      <p><strong>Artis:</strong> <span id="artist_name">{{ current_playback['item']['artists'][0]['name'] }}</span></p>
+      <img id="album_image" src="{{ current_playback['item']['album']['images'][0]['url'] }}" alt="Gambar Album" />
+    </div>
+    <div id="offlineMessage" style="display: none">
+      <h1>Sedang Offline</h1>
+    </div>
+    {% else %}
+    <div id="songInfo" style="display: none">
+      <h1>Info Lagu yang Sedang Diputar</h1>
+      <p><strong>Lagu:</strong> <span id="track_name"></span></p>
+      <p><strong>Artis:</strong> <span id="artist_name"></span></p>
+      <img id="album_image" src="" alt="Gambar Album" />
+    </div>
+    <div id="offlineMessage">
+      <h1>Sedang Offline</h1>
+    </div>
+    {% endif %}
+
+    <script>
+      const eventSource = new EventSource("/events");
+
+      eventSource.onmessage = function (event) {
+        const data = JSON.parse(event.data);
+
+        if (data.error) {
+          // Tangani kesalahan jika ada
+          console.error(data.error);
+        } else {
+          const isPlaying = data.track_name !== "Tidak ada lagu yang sedang diputar";
+
+          if (isPlaying) {
+            // Tampilkan info lagu jika ada lagu yang diputar
+            document.getElementById("songInfo").style.display = "block";
+            document.getElementById("offlineMessage").style.display = "none";
+            document.getElementById("track_name").textContent = data.track_name || "";
+            document.getElementById("artist_name").textContent = data.artist_name || "";
+            document.getElementById("album_image").src = data.album_image_url || "";
+          } else {
+            // Tampilkan pesan offline jika tidak ada lagu yang diputar
+            document.getElementById("songInfo").style.display = "none";
+            document.getElementById("offlineMessage").style.display = "block";
+          }
+        }
+      };
+    </script>
+  </body>
+</html>
