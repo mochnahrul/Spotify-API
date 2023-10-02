@@ -19,10 +19,10 @@ def generate():
     try:
       current_playback = sp.current_playback()
 
-      if current_playback is not None and current_playback.get('is_playing', False):
-        track_name = current_playback['item']['name']
-        artist_name = current_playback['item']['artists'][0]['name']
-        album_image_url = current_playback['item']['album']['images'][0]['url']
+      if current_playback is not None and current_playback.get("is_playing", False):
+        track_name = current_playback["item"]["name"]
+        artist_name = current_playback["item"]["artists"][0]["name"]
+        album_image_url = current_playback["item"]["album"]["images"][0]["url"]
       else:
         track_name = "Tidak ada lagu yang sedang diputar"
         artist_name = ""
@@ -42,19 +42,19 @@ def generate():
 
     yield f"data: {json.dumps(data)}\n\n"
 
-@app.route('/')
+@app.route("/")
 def index():
   current_playback = sp.current_playback()
   is_playing = False
 
-  if current_playback is not None and current_playback['is_playing']:
+  if current_playback is not None and current_playback["is_playing"]:
     is_playing = True
 
-  return render_template('index.html', is_playing=is_playing, current_playback=current_playback)
+  return render_template("index.html", is_playing=is_playing, current_playback=current_playback)
 
-@app.route('/events')
+@app.route("/events")
 def sse():
-  return Response(generate(), content_type='text/event-stream')
+  return Response(generate(), content_type="text/event-stream")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
   app.run(debug=True)
