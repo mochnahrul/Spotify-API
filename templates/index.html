@@ -6,7 +6,7 @@
     <title>Info Lagu</title>
   </head>
   <body>
-    {% if is_playing %}
+    {% if is_playing and current_playback and current_playback['item'] %}
     <div id="songInfo">
       <h1>Info Lagu yang Sedang Diputar</h1>
       <p><strong>Lagu:</strong> <span id="track_name">{{ current_playback['item']['name'] }}</span></p>
@@ -38,15 +38,21 @@
           // Tangani kesalahan jika ada
           console.error(data.error);
         } else {
-          const isPlaying = data.track_name !== "Tidak ada lagu yang sedang diputar";
+          const isPlaying = data.is_playing;
 
           if (isPlaying) {
-            // Tampilkan info lagu jika ada lagu yang diputar
-            document.getElementById("songInfo").style.display = "block";
-            document.getElementById("offlineMessage").style.display = "none";
-            document.getElementById("track_name").textContent = data.track_name || "";
-            document.getElementById("artist_name").textContent = data.artist_name || "";
-            document.getElementById("album_image").src = data.album_image_url || "";
+            if (data.ad_playing) {
+              // Tampilkan pesan offline jika sedang memutar iklan
+              document.getElementById("songInfo").style.display = "none";
+              document.getElementById("offlineMessage").style.display = "block";
+            } else {
+              // Tampilkan info lagu jika ada lagu yang diputar
+              document.getElementById("songInfo").style.display = "block";
+              document.getElementById("offlineMessage").style.display = "none";
+              document.getElementById("track_name").textContent = data.track_name || "";
+              document.getElementById("artist_name").textContent = data.artist_name || "";
+              document.getElementById("album_image").src = data.album_image_url || "";
+            }
           } else {
             // Tampilkan pesan offline jika tidak ada lagu yang diputar
             document.getElementById("songInfo").style.display = "none";
